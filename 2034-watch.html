@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2034 Watch</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f3f5f7;
+    color: #222;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background: #243447;
+    color: white;
+    padding: 25px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+}
+
+header p {
+    margin-bottom: 0;
+    opacity: 0.85;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 25px auto;
+    padding: 0 15px;
+}
+
+.summary {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+}
+
+.card h2 {
+    margin-top: 0;
+    color: #243447;
+    font-size: 1.2rem;
+    border-bottom: 2px solid #e8edf2;
+    padding-bottom: 10px;
+}
+
+ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    margin: 0 0 15px 0;
+    flex-grow: 1;
+}
+
+li {
+    margin-bottom: 15px;
+}
+
+.goal-title {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 3px;
+}
+
+.goal-desc {
+    font-size: 0.85rem;
+    color: #555;
+    margin-bottom: 6px;
+}
+
+select {
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid #bbb;
+    font-size: 0.85rem;
+    width: 100%;
+    background: #fafafa;
+}
+
+button {
+    padding: 9px 14px;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    background: #243447;
+    color: white;
+}
+
+button:hover {
+    opacity: 0.85;
+}
+
+footer {
+    text-align: center;
+    color: #777;
+    padding: 30px;
+    font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🌱 2034 Watch</h1>
+    <p>Figyeljük, hogyan változik Magyarország 2034-ig.</p>
+</header>
+
+<div class="container">
+
+    <div class="summary">
+        <h2>2034-es célok</h2>
+        <p>Ez az oldal a számodra fontos társadalmi, gazdasági, környezetvédelmi és jogi változásokat követi kategóriákra bontott kártyák formájában.</p>
+        <button onclick="resetAll()">Állapotok visszaállítása</button>
+    </div>
+
+    <div class="grid" id="dashboard"></div>
+
+</div>
+
+<footer>
+    2034 Watch — személyes projekt
+</footer>
+
+<script>
+const goals = [
+    {
+        id: "vat",
+        category: "Adózás és megélhetési költségek",
+        title: "Általános ÁFA ≤25%",
+        description: "Az általános magyar ÁFA-kulcs 25%-ra vagy az alá csökken."
+    },
+    {
+        id: "period",
+        category: "Adózás és megélhetési költségek",
+        title: "Menstruációs termékek ÁFÁ-ja ≤5%",
+        description: "A menstruációs termékek ÁFÁ-ja 5%-ra vagy az alá csökken."
+    },
+    {
+        id: "food",
+        category: "Adózás és megélhetési költségek",
+        title: "Alapvető élelmiszerek ÁFÁ-ja ≤5%",
+        description: "Zöldség, gyümölcs, kenyér és releváns tartós élelmiszerek ÁFÁ-ja 5%-ra vagy az alá csökken."
+    },
+    {
+        id: "reproductive",
+        category: "Női és reproduktív jogok",
+        title: "Reproduktív jogok liberalizálása",
+        description: "Javul a reproduktív egészségügyi szolgáltatások hozzáférhetősége, beleértve a sürgősségi fogamzásgátlást."
+    },
+    {
+        id: "istanbul",
+        category: "Női és reproduktív jogok",
+        title: "Isztambuli Egyezmény vagy egyenértékű védelem",
+        description: "Magyarország ratifikálja az Isztambuli Egyezményt, vagy teljesen egyenértékű hazai jogi rendszert hoz létre."
+    },
+    {
+        id: "lgbt",
+        category: "Egyenlőség és LMBTQ+ jogok",
+        title: "LMBTQ+ jogok javulása",
+        description: "Erősödik az LMBTQ+ emberek jogi védelme és egyenlősége."
+    },
+    {
+        id: "pronatalism",
+        category: "Egyenlőség és LMBTQ+ jogok",
+        title: "Kényszerítő pronatalizmus megszüntetése",
+        description: "A gyermekvállalás támogatása nem jár társadalmi vagy jogi kényszerrel."
+    },
+    {
+        id: "social",
+        category: "Egyenlőség és LMBTQ+ jogok",
+        title: "Kiszolgáltatott csoportok erősebb védelme",
+        description: "Erősödik a nők, fogyatékossággal élők és más sérülékeny csoportok támogatása és jogvédelme."
+    },
+    {
+        id: "environment",
+        category: "Környezet és energia",
+        title: "Környezetbarátabb Magyarország",
+        description: "Erősödik a természetvédelem, vízvédelem, megújuló energia és az ipari környezetvédelem."
+    },
+    {
+        id: "wind",
+        category: "Környezet és energia",
+        title: "Szélenergia fejlesztése",
+        description: "Magyarországon érdemben növekszik a szélerőművek és a szélenergia kapacitása."
+    },
+    {
+        id: "russian-energy",
+        category: "Környezet és energia",
+        title: "Orosz gáz- és kőolajfüggőség megszüntetése",
+        description: "Magyarország fokozatosan csökkenti, majd megszünteti az orosz fosszilis energiafüggőségét."
+    },
+    {
+        id: "industry",
+        category: "Gazdaság, mezőgazdaság és innováció",
+        title: "Hazai ipar és innováció erősödése",
+        description: "Növekszik a magyar tulajdonú, magas hozzáadott értékű ipar, gyártás és kutatás-fejlesztés."
+    },
+    {
+        id: "agriculture",
+        category: "Gazdaság, mezőgazdaság és innováció",
+        title: "Modern és erős mezőgazdaság",
+        description: "Technológiailag fejlett, termelékeny és fenntartható hazai mezőgazdaság kialakulása."
+    },
+    {
+        id: "peace",
+        category: "Külpolitika és nemzetközi kapcsolatok",
+        title: "Békés és szolidáris diplomácia",
+        description: "Magyarország együttműködőbb, békepárti és humanitárius külpolitikát folytat."
+    },
+    {
+        id: "ruleoflaw",
+        category: "Jogállamiság és intézmények",
+        title: "Jogállamiság és átláthatóság erősödése",
+        description: "Erősödnek a független intézmények, az átláthatóság és a korrupcióellenes mechanizmusok."
+    },
+    {
+        id: "ubi",
+        category: "AI és gazdasági átalakulás",
+        title: "AI által támogatott újraelosztás",
+        description: "Az automatizációból származó termelékenység társadalmi megosztása erősödik, például alapjövedelem vagy rövidebb munkahét révén."
+    }
+];
+
+function getStatus(id) {
+    return localStorage.getItem("status_" + id) || "⚪ Nincs még értékelve";
+}
+
+function setStatus(id, status) {
+    localStorage.setItem("status_" + id, status);
+    renderDashboard();
+}
+
+function renderDashboard() {
+    const container = document.getElementById("dashboard");
+    container.innerHTML = "";
+
+    // Kategóriák gyűjtése
+    const categories = {};
+    goals.forEach(goal => {
+        if (!categories[goal.category]) {
+            categories[goal.category] = [];
+        }
+        categories[goal.category].push(goal);
+    });
+
+    // Kártyák generálása kategóriánként
+    for (const [categoryName, catGoals] of Object.entries(categories)) {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        let listHTML = `<h2>${categoryName}</h2><ul>`;
+
+        catGoals.forEach(goal => {
+            const current = getStatus(goal.id);
+            listHTML += `
+                <li>
+                    <span class="goal-title">${goal.title}</span>
+                    <div class="goal-desc">${goal.description}</div>
+                    <select onchange="setStatus('${goal.id}', this.value)">
+                        <option ${current === "⚪ Nincs még értékelve" ? "selected" : ""}>⚪ Nincs még értékelve</option>
+                        <option ${current === "🟡 Előrelépés" ? "selected" : ""}>🟡 Előrelépés</option>
+                        <option ${current === "🟢 Teljesült" ? "selected" : ""}>🟢 Teljesült</option>
+                        <option ${current === "🟠 Visszalépés" ? "selected" : ""}>🟠 Visszalépés</option>
+                        <option ${current === "🔴 Jelentős visszalépés" ? "selected" : ""}>🔴 Jelentős visszalépés</option>
+                    </select>
+                </li>
+            `;
+        });
+
+        listHTML += `</ul>`;
+        card.innerHTML = listHTML;
+        container.appendChild(card);
+    }
+}
+
+function resetAll() {
+    if (confirm("Biztosan törölni szeretnéd az összes mentett állapotot?")) {
+        goals.forEach(goal => {
+            localStorage.removeItem("status_" + goal.id);
+        });
+        renderDashboard();
+    }
+}
+
+renderDashboard();
+</script>
+
+</body>
+</html>

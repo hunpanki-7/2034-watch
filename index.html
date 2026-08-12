@@ -84,6 +84,15 @@ li {
     margin-bottom: 3px;
 }
 
+.goal-title a {
+    color: #243447;
+    text-decoration: none;
+}
+
+.goal-title a:hover {
+    text-decoration: underline;
+}
+
 .goal-desc {
     font-size: 0.85rem;
     color: #555;
@@ -132,7 +141,7 @@ footer {
 
     <div class="summary">
         <h2>2034-es célok</h2>
-        <p>Ez az oldal a számodra fontos társadalmi, gazdasági, környezetvédelmi és jogi változásokat követi kategóriákra bontott kártyák formájában.</p>
+        <p>Ez az oldal a beérkezett hírek alapján követi a társadalmi, gazdasági és környezetvédelmi változásokat.</p>
         <button onclick="resetAll()">Állapotok visszaállítása</button>
     </div>
 
@@ -145,141 +154,53 @@ footer {
 </footer>
 
 <script>
-const goals = [
-    {
-        id: "vat",
-        category: "Adózás és megélhetési költségek",
-        title: "Általános ÁFA ≤25%",
-        description: "Az általános magyar ÁFA-kulcs 25%-ra vagy az alá csökken."
-    },
-    {
-        id: "period",
-        category: "Adózás és megélhetési költségek",
-        title: "Menstruációs termékek ÁFÁ-ja ≤5%",
-        description: "A menstruációs termékek ÁFÁ-ja 5%-ra vagy az alá csökken."
-    },
-    {
-        id: "food",
-        category: "Adózás és megélhetési költségek",
-        title: "Alapvető élelmiszerek ÁFÁ-ja ≤5%",
-        description: "Zöldség, gyümölcs, kenyér és releváns tartós élelmiszerek ÁFÁ-ja 5%-ra vagy az alá csökken."
-    },
-    {
-        id: "reproductive",
-        category: "Női és reproduktív jogok",
-        title: "Reproduktív jogok liberalizálása",
-        description: "Javul a reproduktív egészségügyi szolgáltatások hozzáférhetősége, beleértve a sürgősségi fogamzásgátlást."
-    },
-    {
-        id: "istanbul",
-        category: "Női és reproduktív jogok",
-        title: "Isztambuli Egyezmény vagy egyenértékű védelem",
-        description: "Magyarország ratifikálja az Isztambuli Egyezményt, vagy teljesen egyenértékű hazai jogi rendszert hoz létre."
-    },
-    {
-        id: "lgbt",
-        category: "Egyenlőség és LMBTQ+ jogok",
-        title: "LMBTQ+ jogok javulása",
-        description: "Erősödik az LMBTQ+ emberek jogi védelme és egyenlősége."
-    },
-    {
-        id: "pronatalism",
-        category: "Egyenlőség és LMBTQ+ jogok",
-        title: "Kényszerítő pronatalizmus megszüntetése",
-        description: "A gyermekvállalás támogatása nem jár társadalmi vagy jogi kényszerrel."
-    },
-    {
-        id: "social",
-        category: "Egyenlőség és LMBTQ+ jogok",
-        title: "Kiszolgáltatott csoportok erősebb védelme",
-        description: "Erősödik a nők, fogyatékossággal élők és más sérülékeny csoportok támogatása és jogvédelme."
-    },
-    {
-        id: "environment",
-        category: "Környezet és energia",
-        title: "Környezetbarátabb Magyarország",
-        description: "Erősödik a természetvédelem, vízvédelem, megújuló energia és az ipari környezetvédelem."
-    },
-    {
-        id: "wind",
-        category: "Környezet és energia",
-        title: "Szélenergia fejlesztése",
-        description: "Magyarországon érdemben növekszik a szélerőművek és a szélenergia kapacitása."
-    },
-    {
-        id: "russian-energy",
-        category: "Környezet és energia",
-        title: "Orosz gáz- és kőolajfüggőség megszüntetése",
-        description: "Magyarország fokozatosan csökkenti, majd megszünteti az orosz fosszilis energiafüggőségét."
-    },
-    {
-        id: "industry",
-        category: "Gazdaság, mezőgazdaság és innováció",
-        title: "Hazai ipar és innováció erősödése",
-        description: "Növekszik a magyar tulajdonú, magas hozzáadott értékű ipar, gyártás és kutatás-fejlesztés."
-    },
-    {
-        id: "agriculture",
-        category: "Gazdaság, mezőgazdaság és innováció",
-        title: "Modern és erős mezőgazdaság",
-        description: "Technológiailag fejlett, termelékeny és fenntartható hazai mezőgazdaság kialakulása."
-    },
-    {
-        id: "peace",
-        category: "Külpolitika és nemzetközi kapcsolatok",
-        title: "Békés és szolidáris diplomácia",
-        description: "Magyarország együttműködőbb, békepárti és humanitárius külpolitikát folytat."
-    },
-    {
-        id: "ruleoflaw",
-        category: "Jogállamiság és intézmények",
-        title: "Jogállamiság és átláthatóság erősödése",
-        description: "Erősödnek a független intézmények, az átláthatóság és a korrupcióellenes mechanizmusok."
-    },
-    {
-        id: "ubi",
-        category: "AI és gazdasági átalakulás",
-        title: "AI által támogatott újraelosztás",
-        description: "Az automatizációból származó termelékenység társadalmi megosztása erősödik, például alapjövedelem vagy rövidebb munkahét révén."
-    }
-];
+let newsData = [];
 
-function getStatus(id) {
-    return localStorage.getItem("status_" + id) || "⚪ Nincs még értékelve";
+async function loadData() {
+    try {
+        const response = await fetch('data.json');
+        newsData = await response.json();
+        renderDashboard();
+    } catch (error) {
+        console.error("Hiba a data.json betöltésekor:", error);
+        document.getElementById("dashboard").innerHTML = "<p>Nem sikerült betölteni a híreket.</p>";
+    }
 }
 
-function setStatus(id, status) {
-    localStorage.setItem("status_" + id, status);
-    renderDashboard();
+function getStatus(index) {
+    return localStorage.getItem("status_" + index) || "⚪ Nincs még értékelve";
+}
+
+function setStatus(index, status) {
+    localStorage.setItem("status_" + index, status);
 }
 
 function renderDashboard() {
     const container = document.getElementById("dashboard");
     container.innerHTML = "";
 
-    // Kategóriák gyűjtése
     const categories = {};
-    goals.forEach(goal => {
-        if (!categories[goal.category]) {
-            categories[goal.category] = [];
+    newsData.forEach((item, index) => {
+        const cat = item.category || "Egyéb";
+        if (!categories[cat]) {
+            categories[cat] = [];
         }
-        categories[goal.category].push(goal);
+        categories[cat].push({ ...item, originalIndex: index });
     });
 
-    // Kártyák generálása kategóriánként
-    for (const [categoryName, catGoals] of Object.entries(categories)) {
+    for (const [categoryName, items] of Object.entries(categories)) {
         const card = document.createElement("div");
         card.className = "card";
 
         let listHTML = `<h2>${categoryName}</h2><ul>`;
 
-        catGoals.forEach(goal => {
-            const current = getStatus(goal.id);
+        items.forEach(item => {
+            const current = getStatus(item.originalIndex);
             listHTML += `
                 <li>
-                    <span class="goal-title">${goal.title}</span>
-                    <div class="goal-desc">${goal.description}</div>
-                    <select onchange="setStatus('${goal.id}', this.value)">
+                    <span class="goal-title"><a href="${item.link}" target="_blank">${item.title}</a></span>
+                    <div class="goal-desc">${item.summary}</div>
+                    <select onchange="setStatus(${item.originalIndex}, this.value)">
                         <option ${current === "⚪ Nincs még értékelve" ? "selected" : ""}>⚪ Nincs még értékelve</option>
                         <option ${current === "🟡 Előrelépés" ? "selected" : ""}>🟡 Előrelépés</option>
                         <option ${current === "🟢 Teljesült" ? "selected" : ""}>🟢 Teljesült</option>
@@ -298,14 +219,14 @@ function renderDashboard() {
 
 function resetAll() {
     if (confirm("Biztosan törölni szeretnéd az összes mentett állapotot?")) {
-        goals.forEach(goal => {
-            localStorage.removeItem("status_" + goal.id);
+        newsData.forEach((_, index) => {
+            localStorage.removeItem("status_" + index);
         });
         renderDashboard();
     }
 }
 
-renderDashboard();
+loadData();
 </script>
 
 </body>

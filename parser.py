@@ -8,7 +8,7 @@ api_key = os.environ.get("GEMINI_API_KEY")
 if api_key:
     genai.configure(api_key=api_key)
     # Az ingyenesen használható modell
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-2.5-flash')
 else:
     model = None
 
@@ -85,5 +85,5 @@ if __name__ == "__main__":
     news = fetch_news()
     analyzed_news = analyze_with_ai(news)
     with open("data.json", "w", encoding="utf-8") as f:
-        json.dump(analyzed_news, f, ensure_ensure=False if 'ensure_ensure' not in globals() else True, indent=4)
+        json.dump(analyzed_news, f, ensure_ascii=False, indent=4)
     print(f"Kész! {len(analyzed_news)} releváns hír mentve a data.json-be.")

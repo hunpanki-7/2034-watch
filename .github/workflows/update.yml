@@ -1,12 +1,15 @@
 name: 2034 Watch
 
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
 
 jobs:
   run-script:
     runs-on: ubuntu-latest
+
     permissions:
       contents: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -17,17 +20,18 @@ jobs:
           python-version: '3.10'
 
       - name: Install dependencies
-        run: pip install feedparser google-generativeai
+        run: |
+          pip install feedparser google-generativeai
 
-      - name: Run script
+      - name: Run news collector
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python news.py
 
       - name: Save changes
         run: |
-          git config --global user.name "Bot"
-          git config --global user.email "bot@bot.com"
+          git config --global user.name "2034 Watch Bot"
+          git config --global user.email "2034-watch-bot@users.noreply.github.com"
           git add data.json
-          git commit -m "Frissítés" || exit 0
+          git commit -m "Friss hírek és AI értékelések" || exit 0
           git push

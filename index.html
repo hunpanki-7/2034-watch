@@ -6,126 +6,122 @@
 <title>2034 Watch</title>
 
 <style>
+* { box-sizing: border-box; }
+
 body {
-    font-family: Arial, sans-serif;
-    background: #f3f5f7;
-    color: #222;
     margin: 0;
-    padding: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    color: #20252b;
 }
 
 header {
-    background: #243447;
+    background: #263746;
     color: white;
-    padding: 25px;
+    padding: 35px 20px;
     text-align: center;
 }
 
 header h1 {
-    margin: 0;
+    margin: 0 0 8px;
+    font-size: 34px;
 }
 
 header p {
-    margin-bottom: 0;
-    opacity: 0.85;
+    margin: 0;
+    opacity: .85;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 25px auto;
-    padding: 0 15px;
+main {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 0 18px;
 }
 
-.summary {
+.intro {
     background: white;
-    padding: 20px;
-    border-radius: 12px;
+    padding: 22px;
+    border-radius: 14px;
     margin-bottom: 25px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px #00000010;
 }
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 18px;
 }
 
 .card {
     background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    display: flex;
-    flex-direction: column;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 2px 8px #00000010;
 }
 
 .card h2 {
     margin-top: 0;
-    color: #243447;
-    font-size: 1.2rem;
-    border-bottom: 2px solid #e8edf2;
-    padding-bottom: 10px;
+    font-size: 21px;
 }
 
-ul {
-    list-style-type: disc;
+.card ul {
     padding-left: 20px;
-    margin: 0 0 15px 0;
-    flex-grow: 1;
 }
 
-li {
-    margin-bottom: 15px;
+.goal {
+    margin: 13px 0;
 }
 
 .goal-title {
     font-weight: bold;
-    display: block;
-    margin-bottom: 3px;
 }
 
-.goal-title a {
-    color: #243447;
+.status {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 4px 8px;
+    border-radius: 8px;
+    background: #eef1f3;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.news {
+    margin-top: 35px;
+}
+
+.news-item {
+    background: white;
+    padding: 18px;
+    margin: 10px 0;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px #00000010;
+}
+
+.news-item a {
+    color: #205a87;
+    font-weight: bold;
     text-decoration: none;
 }
 
-.goal-title a:hover {
-    text-decoration: underline;
-}
-
-.goal-desc {
-    font-size: 0.85rem;
-    color: #555;
-    margin-bottom: 6px;
-}
-
-select {
-    padding: 6px;
-    border-radius: 6px;
-    border: 1px solid #bbb;
-    font-size: 0.85rem;
-    width: 100%;
-    background: #fafafa;
+.date {
+    color: #777;
+    font-size: 12px;
 }
 
 button {
-    padding: 9px 14px;
-    border: none;
-    border-radius: 7px;
-    cursor: pointer;
-    background: #243447;
+    border: 0;
+    background: #263746;
     color: white;
-}
-
-button:hover {
-    opacity: 0.85;
+    padding: 9px 14px;
+    border-radius: 8px;
+    cursor: pointer;
 }
 
 footer {
     text-align: center;
+    padding: 35px;
     color: #777;
-    padding: 30px;
-    font-size: 13px;
 }
 </style>
 </head>
@@ -134,99 +130,271 @@ footer {
 
 <header>
     <h1>🌱 2034 Watch</h1>
-    <p>Figyeljük, hogyan változik Magyarország 2034-ig.</p>
+    <p>A számodra fontos társadalmi és gazdasági változások követése</p>
 </header>
 
-<div class="container">
+<main>
 
-    <div class="summary">
-        <h2>2034-es célok</h2>
-        <p>Ez az oldal a beérkezett hírek alapján követi a társadalmi, gazdasági és környezetvédelmi változásokat.</p>
-        <button onclick="resetAll()">Állapotok visszaállítása</button>
-    </div>
-
-    <div class="grid" id="dashboard"></div>
-
+<div class="intro">
+    <h2>2034-es figyelő</h2>
+    <p>
+        Ez az oldal azt követi, hogy 2034-ig milyen valódi
+        előrelépések történnek a fontos ügyekben.
+    </p>
+    <button onclick="resetStatuses()">Állapotok alaphelyzetbe állítása</button>
 </div>
 
+<div id="categories" class="grid"></div>
+
+<section class="news">
+    <h2>📰 Legutóbbi releváns hírek</h2>
+    <div id="news"></div>
+</section>
+
+</main>
+
 <footer>
-    2034 Watch — személyes projekt
+    2034 Watch — személyes monitoring projekt
 </footer>
 
 <script>
-let newsData = [];
 
-async function loadData() {
-    try {
-        const response = await fetch('data.json');
-        newsData = await response.json();
-        renderDashboard();
-    } catch (error) {
-        console.error("Hiba a data.json betöltésekor:", error);
-        document.getElementById("dashboard").innerHTML = "<p>Nem sikerült betölteni a híreket.</p>";
-    }
+const categories = [
+{
+    title: "💰 Adózás és megélhetés",
+    goals: [
+        "Általános ÁFA 25% vagy alatta",
+        "Menstruációs termékek ÁFÁ-ja 5% vagy alatta",
+        "Gyümölcs és zöldség ÁFÁ-ja 5% vagy alatta",
+        "Kenyér és alapvető élelmiszerek ÁFÁ-ja 5% vagy alatta",
+        "Tartós/alapvető élelmiszerek ÁFÁ-jának csökkentése",
+        "Igazságosabb, progresszívebb adóztatás",
+        "A háztartások reáljövedelmének javulása"
+    ]
+},
+{
+    title: "🌿 Környezet és energia",
+    goals: [
+        "Szélenergia fejlesztése Magyarországon",
+        "Orosz gázfüggőség megszüntetése",
+        "Orosz kőolajfüggőség megszüntetése",
+        "Megújuló energia fejlesztése",
+        "Energiahatékonyság javítása",
+        "Duna és más vízkészletek jobb védelme",
+        "Természetvédelem és klímavédelem erősítése"
+    ]
+},
+{
+    title: "⚖️ Női és reproduktív jogok",
+    goals: [
+        "Reproduktív jogok liberalizálása",
+        "Sürgősségi fogamzásgátlás könnyebb hozzáférése",
+        "Isztambuli Egyezmény ratifikálása vagy teljesen egyenértékű hazai jogvédelem",
+        "A nők elleni erőszak hatékonyabb megelőzése",
+        "Pink tax és menstruációs költségek csökkentése"
+    ]
+},
+{
+    title: "🏳️‍🌈 Egyenlőség és kisebbségi jogok",
+    goals: [
+        "LMBTQ+ jogok javulása",
+        "Diszkrimináció elleni védelem erősítése",
+        "Kiszolgáltatott csoportok jobb védelme",
+        "Fogyatékossággal élők önállóbb társadalmi részvétele"
+    ]
+},
+{
+    title: "👶 Családpolitika",
+    goals: [
+        "Kényszerítő pronatalista politika megszüntetése",
+        "A gyermekvállalás valóban önkéntes döntésének erősítése",
+        "Gyermektelen emberek hátrányos megkülönböztetésének csökkentése",
+        "Családpolitika kiegyensúlyozottabbá tétele"
+    ]
+},
+{
+    title: "🏭 Gazdaság, ipar és innováció",
+    goals: [
+        "Hazai tulajdonú ipar erősödése",
+        "Magyar kutatás-fejlesztés és innováció erősödése",
+        "Magas hozzáadott értékű gyártás fejlesztése",
+        "Modern, technológiailag fejlett mezőgazdaság",
+        "Hazai vállalkozások és termelők erősítése"
+    ]
+},
+{
+    title: "🕊️ Külpolitika és Európa",
+    goals: [
+        "Békés és együttműködő diplomácia",
+        "Erősebb európai együttműködés",
+        "Humanitárius szolidaritás",
+        "Orosz energiafüggőség fokozatos felszámolása"
+    ]
+},
+{
+    title: "⚖️ Jogállam és igazságosság",
+    goals: [
+        "Független intézmények erősítése",
+        "Átláthatóbb állam",
+        "Korrupcióellenes intézkedések",
+        "Erősebb jogbiztonság",
+        "EU-s jogállamisági normákhoz való közeledés"
+    ]
+},
+{
+    title: "🤖 AI, automatizáció és jólét",
+    goals: [
+        "AI által létrehozott termelékenység társadalmi hasznának megosztása",
+        "Rövidebb munkahét vagy nagyobb munkaszabadság",
+        "A megélhetés kevésbé függjön a munkaviszonytól",
+        "Feltétel nélküli alapjövedelemhez hasonló rendszerek megjelenése",
+        "Az automatizáció előnyeinek társadalmi újraelosztása"
+    ]
+}
+];
+
+function statusKey(category, goal) {
+    return "status_" + category + "_" + goal;
 }
 
-function getStatus(index) {
-    return localStorage.getItem("status_" + index) || "⚪ Nincs még értékelve";
+function getStatus(category, goal) {
+    return localStorage.getItem(statusKey(category, goal))
+        || "⚪ Nincs értékelve";
 }
 
-function setStatus(index, status) {
-    localStorage.setItem("status_" + index, status);
+function nextStatus(category, goal) {
+
+    const states = [
+        "⚪ Nincs értékelve",
+        "🟡 Vita / kezdeményezés",
+        "🔵 Konkrét előrelépés",
+        "🟢 Teljesült",
+        "🔴 Visszalépés"
+    ];
+
+    const current = getStatus(category, goal);
+    const index = states.indexOf(current);
+    const next = states[(index + 1) % states.length];
+
+    localStorage.setItem(
+        statusKey(category, goal),
+        next
+    );
+
+    render();
 }
 
-function renderDashboard() {
-    const container = document.getElementById("dashboard");
+function render() {
+
+    const container = document.getElementById("categories");
     container.innerHTML = "";
 
-    const categories = {};
-    newsData.forEach((item, index) => {
-        const cat = item.category || "Egyéb";
-        if (!categories[cat]) {
-            categories[cat] = [];
-        }
-        categories[cat].push({ ...item, originalIndex: index });
-    });
+    categories.forEach(category => {
 
-    for (const [categoryName, items] of Object.entries(categories)) {
         const card = document.createElement("div");
         card.className = "card";
 
-        let listHTML = `<h2>${categoryName}</h2><ul>`;
+        const list = document.createElement("ul");
 
-        items.forEach(item => {
-            const current = getStatus(item.originalIndex);
-            listHTML += `
-                <li>
-                    <span class="goal-title"><a href="${item.link}" target="_blank">${item.title}</a></span>
-                    <div class="goal-desc">${item.summary}</div>
-                    <select onchange="setStatus(${item.originalIndex}, this.value)">
-                        <option ${current === "⚪ Nincs még értékelve" ? "selected" : ""}>⚪ Nincs még értékelve</option>
-                        <option ${current === "🟡 Előrelépés" ? "selected" : ""}>🟡 Előrelépés</option>
-                        <option ${current === "🟢 Teljesült" ? "selected" : ""}>🟢 Teljesült</option>
-                        <option ${current === "🟠 Visszalépés" ? "selected" : ""}>🟠 Visszalépés</option>
-                        <option ${current === "🔴 Jelentős visszalépés" ? "selected" : ""}>🔴 Jelentős visszalépés</option>
-                    </select>
-                </li>
+        category.goals.forEach(goal => {
+
+            const li = document.createElement("li");
+            li.className = "goal";
+
+            li.innerHTML = `
+                <div class="goal-title">${goal}</div>
+                <span
+                    class="status"
+                    title="Kattints az állapot megváltoztatásához"
+                    onclick="nextStatus('${escapeJs(category.title)}','${escapeJs(goal)}')">
+                    ${getStatus(category.title, goal)}
+                </span>
             `;
+
+            list.appendChild(li);
         });
 
-        listHTML += `</ul>`;
-        card.innerHTML = listHTML;
+        card.innerHTML = `<h2>${category.title}</h2>`;
+        card.appendChild(list);
+
         container.appendChild(card);
-    }
+    });
+
+    loadNews();
 }
 
-function resetAll() {
-    if (confirm("Biztosan törölni szeretnéd az összes mentett állapotot?")) {
-        newsData.forEach((_, index) => {
-            localStorage.removeItem("status_" + index);
+function escapeJs(text) {
+    return text.replace(/'/g, "\\'");
+}
+
+function loadNews() {
+
+    const newsContainer = document.getElementById("news");
+
+    fetch("news.json?cache=" + Date.now())
+        .then(response => {
+
+            if (!response.ok)
+                throw new Error("Nincs news.json");
+
+            return response.json();
+
+        })
+        .then(news => {
+
+            newsContainer.innerHTML = "";
+
+            if (!news.length) {
+                newsContainer.innerHTML =
+                    "<p>Még nincs feldolgozott hír.</p>";
+                return;
+            }
+
+            news.forEach(item => {
+
+                const div =
+                    document.createElement("div");
+
+                div.className = "news-item";
+
+                div.innerHTML = `
+                    <div class="date">${item.date || ""}</div>
+                    <a href="${item.url}" target="_blank">
+                        ${item.title}
+                    </a>
+                    <p>${item.summary || ""}</p>
+                    <small>
+                        ${item.category || ""}
+                        ${item.impact ? " · " + item.impact : ""}
+                    </small>
+                `;
+
+                newsContainer.appendChild(div);
+            });
+
+        })
+        .catch(() => {
+
+            newsContainer.innerHTML =
+                "<p>A hírszolgáltatás még nincs beállítva, vagy nincs internetes tárhelyről megnyitva az oldal.</p>";
+
         });
-        renderDashboard();
-    }
 }
 
-loadData();
+function resetStatuses() {
+
+    if (!confirm("Töröljük az összes állapotot?"))
+        return;
+
+    Object.keys(localStorage)
+        .filter(key => key.startsWith("status_"))
+        .forEach(key => localStorage.removeItem(key));
+
+    render();
+}
+
+render();
+
 </script>
 
 </body>

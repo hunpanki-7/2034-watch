@@ -1,112 +1,130 @@
 {
-  "language": "hu",
-  "country": "HU",
-  "deadline": "2034-12-31",
-
   "news": {
+    "lookback_days": 14,
+    "ai_articles": 30,
     "max_articles": 30,
-    "lookback_days": 7,
+
     "sources": [
       {
-        "name": "Google News HU",
-        "url": "https://news.google.com/rss/search?q=Magyarorsz%C3%A1g%20%C3%81FA%20OR%20ad%C3%B3%20OR%20menstru%C3%A1ci%C3%B3s%20term%C3%A9k&hl=hu&gl=HU&ceid=HU:hu"
+        "name": "Euronews Hungary",
+        "url": "https://hu.euronews.com/rss?format=mrss"
       },
       {
-        "name": "Google News EU",
-        "url": "https://news.google.com/rss/search?q=Hungary%20EU%20rights%20OR%20tax%20OR%20energy&hl=en&gl=HU&ceid=HU:en"
+        "name": "Portfolio",
+        "url": "https://www.portfolio.hu/rss"
+      },
+      {
+        "name": "Telex",
+        "url": "https://telex.hu/rss"
       }
     ]
   },
 
   "categories": {
-    "Adózás és megélhetés": [
+
+    "ÁFA és megélhetési költségek": [
       "áfa",
-      "ÁFA",
+      "forgalmi adó",
       "adócsökkentés",
-      "progresszív adó",
-      "menstruációs termék",
-      "gyümölcs",
+      "élelmiszer",
+      "árak",
+      "megélhetési költség",
+      "infláció",
       "zöldség",
+      "gyümölcs",
       "kenyér",
-      "élelmiszer"
+      "konzerv",
+      "menstruációs termék",
+      "betét",
+      "tampon"
     ],
 
-    "Környezet és energia": [
-      "szélerőmű",
-      "szélenergia",
-      "megújuló energia",
-      "orosz gáz",
-      "orosz olaj",
-      "kőolaj",
-      "Duna",
-      "Paks",
-      "vízvédelem",
-      "klímavédelem"
-    ],
-
-    "Női és reproduktív jogok": [
-      "reproduktív jog",
+    "Női jogok és reprodukció": [
+      "menstruáció",
+      "menstruációs",
+      "reprodukció",
       "abortusz",
       "fogamzásgátlás",
-      "esemény utáni tabletta",
-      "sürgősségi fogamzásgátlás",
-      "Isztambuli Egyezmény",
+      "esemény utáni",
+      "női jogok",
       "nők elleni erőszak",
-      "pink tax"
+      "isztambuli egyezmény"
     ],
 
-    "Egyenlőség és kisebbségi jogok": [
-      "LMBTQ",
-      "LGBTQ",
-      "diszkrimináció",
-      "fogyatékosság",
-      "kisebbségi jog"
+    "LMBTQ+ jogok": [
+      "lmbt",
+      "lgbt",
+      "lgbtq",
+      "melegek",
+      "homoszexuális",
+      "transznemű",
+      "azonos nemű",
+      "egyenlőség"
     ],
 
-    "Családpolitika": [
-      "pronatalista",
-      "pronatalizmus",
-      "családpolitika",
-      "gyermekvállalás",
-      "gyermektelen"
+    "Környezetvédelem és energiafüggetlenség": [
+      "klímaváltozás",
+      "környezetvédelem",
+      "megújuló energia",
+      "napenergia",
+      "szélenergia",
+      "naperőmű",
+      "szélerőmű",
+      "orosz gáz",
+      "orosz olaj",
+      "orosz kőolaj",
+      "energiafüggetlenség",
+      "Paks",
+      "Duna",
+      "vízszint"
     ],
 
-    "Gazdaság, ipar és innováció": [
-      "magyar tulajdon",
-      "hazai ipar",
+    "Gazdaság és innováció": [
       "innováció",
       "kutatás-fejlesztés",
+      "startup",
+      "gyár",
+      "ipar",
       "mezőgazdaság",
-      "magyar gyár",
-      "hazai vállalkozás"
-    ],
-
-    "Külpolitika és Európa": [
-      "EU",
-      "Európai Unió",
-      "diplomácia",
-      "humanitárius",
-      "Ukrajna",
-      "Oroszország"
-    ],
-
-    "Jogállam és igazságosság": [
-      "jogállam",
-      "korrupció",
-      "átláthatóság",
-      "független intézmény",
-      "EU forrás",
-      "Európai Ügyészség"
-    ],
-
-    "AI, automatizáció és jólét": [
-      "mesterséges intelligencia",
-      "AI",
+      "magyar tulajdon",
+      "hazai tulajdon",
       "automatizáció",
-      "robotizáció",
+      "mesterséges intelligencia",
+      "robotika"
+    ],
+
+    "Szociális biztonság és alapjövedelem": [
       "alapjövedelem",
       "feltétel nélküli alapjövedelem",
-      "rövidebb munkahét"
+      "szociális támogatás",
+      "szociális ellátás",
+      "fogyatékosság",
+      "fogyatékos",
+      "ápolási díj",
+      "szegénység",
+      "szociális védelem"
+    ],
+
+    "Demokrácia és jogállamiság": [
+      "jogállam",
+      "demokrácia",
+      "korrupció",
+      "igazságszolgáltatás",
+      "ügyészség",
+      "európai ügyészség",
+      "jogok",
+      "emberi jogok"
+    ],
+
+    "Békés külpolitika": [
+      "béke",
+      "diplomácia",
+      "tűzszünet",
+      "béketárgyalás",
+      "háború",
+      "Ukrajna",
+      "Oroszország",
+      "EU külpolitika"
     ]
   }
 }

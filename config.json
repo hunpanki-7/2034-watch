@@ -1,0 +1,112 @@
+{
+  "language": "hu",
+  "country": "HU",
+  "deadline": "2034-12-31",
+
+  "news": {
+    "max_articles": 30,
+    "lookback_days": 7,
+    "sources": [
+      {
+        "name": "Google News HU",
+        "url": "https://news.google.com/rss/search?q=Magyarorsz%C3%A1g%20%C3%81FA%20OR%20ad%C3%B3%20OR%20menstru%C3%A1ci%C3%B3s%20term%C3%A9k&hl=hu&gl=HU&ceid=HU:hu"
+      },
+      {
+        "name": "Google News EU",
+        "url": "https://news.google.com/rss/search?q=Hungary%20EU%20rights%20OR%20tax%20OR%20energy&hl=en&gl=HU&ceid=HU:en"
+      }
+    ]
+  },
+
+  "categories": {
+    "Adózás és megélhetés": [
+      "áfa",
+      "ÁFA",
+      "adócsökkentés",
+      "progresszív adó",
+      "menstruációs termék",
+      "gyümölcs",
+      "zöldség",
+      "kenyér",
+      "élelmiszer"
+    ],
+
+    "Környezet és energia": [
+      "szélerőmű",
+      "szélenergia",
+      "megújuló energia",
+      "orosz gáz",
+      "orosz olaj",
+      "kőolaj",
+      "Duna",
+      "Paks",
+      "vízvédelem",
+      "klímavédelem"
+    ],
+
+    "Női és reproduktív jogok": [
+      "reproduktív jog",
+      "abortusz",
+      "fogamzásgátlás",
+      "esemény utáni tabletta",
+      "sürgősségi fogamzásgátlás",
+      "Isztambuli Egyezmény",
+      "nők elleni erőszak",
+      "pink tax"
+    ],
+
+    "Egyenlőség és kisebbségi jogok": [
+      "LMBTQ",
+      "LGBTQ",
+      "diszkrimináció",
+      "fogyatékosság",
+      "kisebbségi jog"
+    ],
+
+    "Családpolitika": [
+      "pronatalista",
+      "pronatalizmus",
+      "családpolitika",
+      "gyermekvállalás",
+      "gyermektelen"
+    ],
+
+    "Gazdaság, ipar és innováció": [
+      "magyar tulajdon",
+      "hazai ipar",
+      "innováció",
+      "kutatás-fejlesztés",
+      "mezőgazdaság",
+      "magyar gyár",
+      "hazai vállalkozás"
+    ],
+
+    "Külpolitika és Európa": [
+      "EU",
+      "Európai Unió",
+      "diplomácia",
+      "humanitárius",
+      "Ukrajna",
+      "Oroszország"
+    ],
+
+    "Jogállam és igazságosság": [
+      "jogállam",
+      "korrupció",
+      "átláthatóság",
+      "független intézmény",
+      "EU forrás",
+      "Európai Ügyészség"
+    ],
+
+    "AI, automatizáció és jólét": [
+      "mesterséges intelligencia",
+      "AI",
+      "automatizáció",
+      "robotizáció",
+      "alapjövedelem",
+      "feltétel nélküli alapjövedelem",
+      "rövidebb munkahét"
+    ]
+  }
+}

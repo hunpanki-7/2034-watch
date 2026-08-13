@@ -22,7 +22,7 @@ jobs:
       - name: Run script
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python parser.py
+        run: python news.py
 
       - name: Save changes
         run: |

@@ -331,7 +331,7 @@ function loadNews() {
 
     const newsContainer = document.getElementById("news");
 
-    fetch("news.json?cache=" + Date.now())
+    fetch("data.json?cache=" + Date.now())
         .then(response => {
 
             if (!response.ok)

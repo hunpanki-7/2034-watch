@@ -1,13 +1,13 @@
 import json
+import os
 import re
 import urllib.request
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone, timedelta
 from email.utils import parsedate_to_datetime
 
-
 CONFIG_FILE = "config.json"
-OUTPUT_FILE = "news.json"
+OUTPUT_FILE = "data.json"
 
 
 def load_config():
@@ -18,9 +18,7 @@ def load_config():
 def download(url):
     request = urllib.request.Request(
         url,
-        headers={
-            "User-Agent": "2034-Watch/1.0"
-        }
+        headers={"User-Agent": "2034-Watch/1.0"}
     )
 
     with urllib.request.urlopen(request, timeout=30) as response:
@@ -31,12 +29,15 @@ def clean(text):
     if not text:
         return ""
 
-    text = re.sub("<[^>]+>", "", text)
-    text = text.replace("&amp;", "&")
-    text = text.replace("&quot;", '"')
-    text = text.replace("&#39;", "'")
+    text = re.sub(r"<[^>]+>", "", text)
+    text = re.sub(r"\s+", " ", text)
 
-    return " ".join(text.split())
+    return (
+        text.replace("&amp;", "&")
+        .replace("&quot;", '"')
+        .replace("&#39;", "'")
+        .strip()
+    )
 
 
 def parse_date(value):
@@ -49,103 +50,133 @@ def parse_date(value):
         return None
 
 
-def find_category(text, categories):
-
-    text = text.lower()
-
-    best_category = None
-    best_score = 0
-
-    for category, keywords in categories.items():
-
-        score = 0
-
-        for keyword in keywords:
-
-            if keyword.lower() in text:
-                score += 1
-
-        if score > best_score:
-            best_score = score
-            best_category = category
-
-    return best_category, best_score
-
-
-def impact(text):
-
-    text = text.lower()
-
-    positive = [
-        "csökkent",
-        "csökkenti",
-        "elfogad",
-        "elfogadták",
-        "bevezeti",
-        "bevezet",
-        "javul",
-        "erősíti",
-        "megszünteti",
-        "ratifikál",
-        "engedélyezi"
-    ]
-
-    negative = [
-        "szigorít",
-        "emelés",
-        "emeli",
-        "betilt",
-        "megszünteti a támogatást",
-        "visszalépés",
-        "korlátozza",
-        "korlátozás"
-    ]
-
-    p = sum(word in text for word in positive)
-    n = sum(word in text for word in negative)
-
-    if p > n and p > 0:
-        return "🟢 valószínű pozitív irány"
-
-    if n > p and n > 0:
-        return "🔴 valószínű negatív irány"
-
-    return "⚪ semleges / további ellenőrzés szükséges"
-
-
 def parse_rss(data, source_name):
-
     root = ET.fromstring(data)
-
     articles = []
 
     for item in root.findall(".//item"):
+        title = clean(item.findtext("title", ""))
+        link = clean(item.findtext("link", ""))
+        description = clean(item.findtext("description", ""))
+        date = parse_date(item.findtext("pubDate", ""))
 
-        title = clean(
-            item.findtext("title", "")
-        )
-
-        link = clean(
-            item.findtext("link", "")
-        )
-
-        description = clean(
-            item.findtext("description", "")
-        )
-
-        date = parse_date(
-            item.findtext("pubDate", "")
-        )
+        if not title or not link:
+            continue
 
         articles.append({
             "title": title,
             "url": link,
-            "summary": description[:500],
+            "summary": description[:1000],
             "date": date.isoformat() if date else "",
             "source": source_name
         })
 
     return articles
+
+
+def keyword_relevance(article, categories):
+    text = (
+        article["title"] + " " + article["summary"]
+    ).lower()
+
+    matches = []
+
+    for category, keywords in categories.items():
+        score = 0
+
+        for keyword in keywords:
+            if keyword.lower() in text:
+                score += 1
+
+        if score:
+            matches.append((category, score))
+
+    if not matches:
+        return None, 0
+
+    matches.sort(key=lambda x: x[1], reverse=True)
+
+    return matches[0]
+
+
+def ai_analyse(article, categories):
+    """
+    Gemini analysis.
+
+    If GEMINI_API_KEY is not available, the program falls back
+    to the keyword system instead of crashing.
+    """
+
+    api_key = os.environ.get("GEMINI_API_KEY")
+
+    if not api_key:
+        return None
+
+    try:
+        import google.generativeai as genai
+
+        genai.configure(api_key=api_key)
+
+        model = genai.GenerativeModel(
+            "gemini-2.0-flash"
+        )
+
+        category_names = ", ".join(categories.keys())
+
+        prompt = f"""
+You are the analysis engine of a personal news tracker called 2034 Watch.
+
+The user is tracking long-term progress in Hungary and the EU.
+
+Categories:
+{category_names}
+
+Article title:
+{article["title"]}
+
+Article summary:
+{article["summary"]}
+
+Return ONLY valid JSON in this exact structure:
+
+{{
+  "category": "one category from the list",
+  "impact": "positive OR negative OR neutral",
+  "importance": 1,
+  "progress": 0,
+  "explanation": "one short sentence in Hungarian"
+}}
+
+Rules:
+
+- importance: 1-5
+- progress: -2, -1, 0, +1 or +2
+- +2 means major progress toward the user's goals
+- +1 means smaller progress
+- 0 means unclear or unrelated
+- -1 means setback
+- -2 means major setback
+- Do not treat ordinary political statements as completed reforms.
+- Distinguish announcements from actual laws or implementation.
+- Be factual and cautious.
+"""
+
+        response = model.generate_content(prompt)
+
+        text = response.text.strip()
+
+        text = re.sub(
+            r"^```json\s*|\s*```$",
+            "",
+            text,
+            flags=re.IGNORECASE
+        )
+
+        return json.loads(text)
+
+    except Exception as error:
+        print("Gemini hiba:", error)
+        return None
 
 
 def main():
@@ -158,11 +189,12 @@ def main():
         days=config["news"]["lookback_days"]
     )
 
-    results = []
+    candidates = []
 
     for source in config["news"]["sources"]:
 
         try:
+            print("Forrás:", source["name"])
 
             data = download(source["url"])
 
@@ -174,7 +206,6 @@ def main():
             for article in articles:
 
                 if article["date"]:
-
                     try:
                         article_date = datetime.fromisoformat(
                             article["date"]
@@ -186,29 +217,17 @@ def main():
                     except Exception:
                         pass
 
-                combined = (
-                    article["title"]
-                    + " "
-                    + article["summary"]
-                )
-
-                category, score = find_category(
-                    combined,
+                category, score = keyword_relevance(
+                    article,
                     categories
                 )
 
                 if not category:
                     continue
 
-                article["category"] = category
+                article["_keyword_score"] = score
 
-                article["relevance"] = score
-
-                article["impact"] = impact(
-                    combined
-                )
-
-                results.append(article)
+                candidates.append(article)
 
         except Exception as error:
 
@@ -218,18 +237,88 @@ def main():
                 error
             )
 
+    # Duplicate removal
     unique = {}
 
-    for article in results:
+    for article in candidates:
 
         key = article["url"] or article["title"]
 
-        unique[key] = article
+        if key not in unique:
+            unique[key] = article
 
-    results = list(unique.values())
+    candidates = list(unique.values())
+
+    # Highest keyword relevance first
+    candidates.sort(
+        key=lambda x: x["_keyword_score"],
+        reverse=True
+    )
+
+    # Don't send hundreds of articles to Gemini
+    candidates = candidates[
+        :config["news"]["ai_articles"]
+    ]
+
+    results = []
+
+    for article in candidates:
+
+        analysis = ai_analyse(
+            article,
+            categories
+        )
+
+        if analysis:
+
+            article["category"] = analysis.get(
+                "category",
+                ""
+            )
+
+            article["impact"] = analysis.get(
+                "impact",
+                "neutral"
+            )
+
+            article["importance"] = analysis.get(
+                "importance",
+                1
+            )
+
+            article["progress"] = analysis.get(
+                "progress",
+                0
+            )
+
+            article["explanation"] = analysis.get(
+                "explanation",
+                ""
+            )
+
+        else:
+
+            article["category"] = keyword_relevance(
+                article,
+                categories
+            )[0]
+
+            article["impact"] = "neutral"
+            article["importance"] = 1
+            article["progress"] = 0
+            article["explanation"] = (
+                "AI-értékelés nem érhető el."
+            )
+
+        article.pop("_keyword_score", None)
+
+        results.append(article)
 
     results.sort(
-        key=lambda x: x.get("relevance", 0),
+        key=lambda x: (
+            x.get("importance", 1),
+            x.get("progress", 0)
+        ),
         reverse=True
     )
 
@@ -244,14 +333,20 @@ def main():
     ) as f:
 
         json.dump(
-            results,
+            {
+                "updated": datetime.now(
+                    timezone.utc
+                ).isoformat(),
+
+                "articles": results
+            },
             f,
             ensure_ascii=False,
             indent=2
         )
 
     print(
-        f"{len(results)} releváns hírt mentettem."
+        f"{len(results)} AI-val értékelt hírt mentettem."
     )
 
 
